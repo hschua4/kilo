@@ -1,36 +1,79 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ScaleIQ
 
-## Getting Started
+Personal weight tracking and body analytics — log your weight, visualize the
+trend, set a goal, and get AI-generated progress insights.
 
-First, run the development server:
+## Stack
+
+- **Next.js 16** (App Router, RSC) + **TypeScript**
+- **Tailwind CSS v4** + **shadcn/ui**
+- **Prisma 7** + **PostgreSQL** (via the `@prisma/adapter-pg` driver adapter)
+- **Better Auth** (email + password, password reset)
+- **Apache ECharts** for the trend chart
+- **OpenRouter** for AI insights (model configurable, with a rule-based fallback)
+
+## Features
+
+- Email/password auth with password reset, per-user data isolation
+- Weight logging: add / edit / delete, one entry per day, full history
+- Dashboard: current weight, goal, weekly & monthly change, trend chart
+- Trend chart: daily weight + 7-day moving average + goal line, zoomable,
+  with 1M / 3M / 6M / 1Y / All ranges
+- Goal management: starting weight, target weight, target pace, with a live
+  projected completion date
+- AI insights: trend summary, plateau detection, and goal projection
+
+## Getting started
+
+### 1. Prerequisites
+
+- Node.js 18+ and a running PostgreSQL instance.
+
+### 2. Environment
+
+Copy `.env.example` to `.env` and fill in the values:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp .env.example .env
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- `DATABASE_URL` — your Postgres connection string
+- `BETTER_AUTH_SECRET` — generate with `openssl rand -hex 32`
+- `BETTER_AUTH_URL` — base URL (default `http://localhost:3000`)
+- `OPENROUTER_API_KEY` — optional; without it, insights use a built-in
+  rule-based generator
+- `OPENROUTER_MODEL` — any OpenRouter model id (default `anthropic/claude-3.5-haiku`)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 3. Install & migrate
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm install          # also runs `prisma generate`
+npm run db:migrate   # applies migrations to your database
+```
 
-## Learn More
+### 4. Run
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run dev          # http://localhost:3000
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Notes
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Password reset emails** are not wired to a mail provider in this MVP — the
+  reset link is printed to the server console. Swap in a real mailer in
+  `src/lib/auth.ts` (`sendResetPassword`) for production.
+- The Prisma client is generated to `src/generated/prisma` (gitignored) and
+  regenerated on `npm install` via the `postinstall` script.
 
-## Deploy on Vercel
+## Project layout
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+src/
+  app/
+    (auth)/        sign-in, sign-up, forgot/reset password
+    (app)/         dashboard, log, goal, insights (auth-guarded)
+    api/           auth, entries, goal, insights route handlers
+  components/      UI + feature components (chart, tables, forms)
+  lib/             auth, prisma, analytics, insights, validation
+prisma/            schema + migrations
+```

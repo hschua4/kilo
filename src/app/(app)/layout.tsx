@@ -12,7 +12,7 @@ export default async function AppLayout({
 
   return (
     <div className="flex min-h-svh flex-col">
-      <header className="sticky top-0 z-10 border-b border-border bg-background/80 backdrop-blur">
+      <header className="sticky top-0 z-10 border-b border-border bg-background/80 pt-[env(safe-area-inset-top)] backdrop-blur">
         <div className="mx-auto flex h-14 w-full max-w-2xl items-center px-5">
           <Link
             href="/dashboard"

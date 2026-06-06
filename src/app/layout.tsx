@@ -29,6 +29,10 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: "#09090b",
+  // Extend the layout viewport into the iOS safe areas (notch / home
+  // indicator) so the PWA renders edge-to-edge. Required for the
+  // env(safe-area-inset-*) values below to be non-zero.
+  viewportFit: "cover",
 };
 
 export default function RootLayout({

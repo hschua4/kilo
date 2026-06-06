@@ -47,7 +47,7 @@ export function BottomNav({ name, email }: { name: string; email: string }) {
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-background/85 backdrop-blur">
-      <div className="mx-auto grid h-16 max-w-2xl grid-cols-5 items-center px-2 pb-[env(safe-area-inset-bottom)]">
+      <div className="mx-auto grid h-16 max-w-2xl grid-cols-5 items-center px-2 pb-[calc(env(safe-area-inset-bottom)+0.5rem)]">
         <NavTab {...tabs[0]} active={isActive(tabs[0].href)} />
         <NavTab {...tabs[1]} active={isActive(tabs[1].href)} />
 

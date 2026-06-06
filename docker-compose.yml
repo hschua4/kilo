@@ -1,0 +1,63 @@
+# Prod stack on the Skylab VPS (/srv/kilo).
+# Postgres + Traefik live in /srv/infra; this stack joins their external networks.
+# Images are built in CI and pulled by tag — never built on the VPS.
+#
+# Deploy order (see .github/workflows/deploy.yml):
+#   docker compose pull
+#   docker compose run --rm migrate      # apply migrations before swap
+#   docker compose up -d kilo            # rolling start-first swap
+
+services:
+  # One-shot migration runner. Excluded from `up` via the profile; invoked
+  # explicitly with `docker compose run --rm migrate`.
+  migrate:
+    image: ghcr.io/${GITHUB_OWNER}/kilo-migrate:${IMAGE_TAG:-latest}
+    profiles: ["migrate"]
+    restart: "no"
+    env_file: .env
+    networks:
+      - postgres
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  kilo:
+    image: ghcr.io/${GITHUB_OWNER}/kilo:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    mem_limit: 384m
+    env_file: .env
+    networks:
+      - proxy
+      - postgres
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.kilo.rule=Host(`kilo.hschua.com`)"
+      - "traefik.http.routers.kilo.entrypoints=websecure"
+      - "traefik.http.routers.kilo.tls=true"
+      - "traefik.http.services.kilo.loadbalancer.server.port=3000"
+      - "traefik.http.services.kilo.loadbalancer.healthcheck.path=/health"
+      - "traefik.http.services.kilo.loadbalancer.healthcheck.interval=15s"
+    deploy:
+      update_config:
+        order: start-first
+        failure_action: rollback
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  proxy:
+    external: true
+  postgres:
+    external: true

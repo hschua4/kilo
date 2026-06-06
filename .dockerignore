@@ -1,0 +1,19 @@
+.git
+.github
+node_modules
+.next
+out
+build
+coverage
+# Regenerated inside the image by `prisma generate`.
+src/generated
+# Never bake secrets into the image.
+.env
+.env.*
+!.env.production.example
+docker-compose*.yml
+Dockerfile
+*.md
+.DS_Store
+*.log
+tsconfig.tsbuildinfo

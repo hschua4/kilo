@@ -1,0 +1,85 @@
+name: deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: "Image SHA tag to deploy (7-char short SHA)"
+        required: true
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Join Tailscale
+        uses: tailscale/github-action@v3
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+          tags: tag:ci
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H "${{ secrets.VPS_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Sync compose file to VPS
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+        run: |
+          ssh -i ~/.ssh/id_ed25519 "$VPS_USER@$VPS_HOST" "mkdir -p /srv/kilo"
+          scp -i ~/.ssh/id_ed25519 docker-compose.yml "$VPS_USER@$VPS_HOST:/srv/kilo/docker-compose.yml"
+
+      - name: Deploy
+        env:
+          SHA: sha-${{ inputs.sha }}
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+        run: |
+          ssh -i ~/.ssh/id_ed25519 "$VPS_USER@$VPS_HOST" bash -se <<EOF
+            set -euo pipefail
+            cd /srv/kilo
+
+            # Pin image tag for this deploy and pull both images.
+            export IMAGE_TAG="$SHA"
+            export GITHUB_OWNER="${{ github.repository_owner }}"
+            echo "Deploying IMAGE_TAG=\$IMAGE_TAG"
+
+            docker compose pull
+
+            # Apply migrations in a one-shot container before swapping the app.
+            # Halts the deploy here if a migration fails.
+            docker compose run --rm migrate
+
+            # Rolling swap with healthcheck-aware start-first.
+            docker compose up -d kilo --remove-orphans
+
+            # Record current SHA for visibility.
+            echo "$SHA" > /srv/kilo/CURRENT_SHA
+
+            # Disk hygiene — keep yesterday's image for fast rollback.
+            docker image prune -af --filter "until=24h"
+          EOF
+
+      - name: Smoke test
+        run: |
+          for i in 1 2 3 4 5 6; do
+            if curl -fsS https://kilo.hschua.com/health > /dev/null; then
+              echo "smoke ok"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "smoke failed"
+          exit 1

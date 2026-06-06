@@ -1,27 +1,16 @@
 import Link from "next/link";
-import { ArrowRightIcon, SparklesIcon } from "lucide-react";
+import { PlusIcon } from "lucide-react";
 import { requireUser } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { getUserEntries, toAnalyticsEntries } from "@/lib/entries";
 import { computeStats, type DashboardStats } from "@/lib/analytics";
 import { fallbackInsight } from "@/lib/insights";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { StatCard } from "@/components/stat-card";
-import { QuickAddWeight } from "@/components/quick-add-weight";
+import { MetricHero } from "@/components/metric-hero";
+import { GoalProgressCard } from "@/components/goal-progress-card";
+import { AIInsightCard } from "@/components/ai-insight-card";
 import { WeightChart } from "@/components/weight-chart";
-
-function signed(n: number | null, dp = 1): string {
-  if (n === null) return "—";
-  return `${n > 0 ? "+" : ""}${n.toFixed(dp)}`;
-}
 
 /** Is a weight change moving the user toward their goal? */
 function changeTone(
@@ -54,127 +43,79 @@ export default async function DashboardPage() {
   );
 
   const hasEntries = entries.length > 0;
-  const quickSummary = fallbackInsight(stats);
+
+  const monthly = stats.monthlyChange;
+  const heroTrend =
+    monthly === null || Math.abs(monthly) < 0.05
+      ? "flat"
+      : monthly < 0
+        ? "down"
+        : "up";
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-wrap items-center justify-between gap-2">
+    <div className="flex flex-col gap-4">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">
-            Hi, {user.name.split(" ")[0] || "there"} 👋
+          <h1 className="text-xl font-semibold tracking-tight">
+            Hi, {user.name.split(" ")[0] || "there"}
           </h1>
-          <p className="text-sm text-muted-foreground">
-            Here&apos;s how your progress is tracking.
-          </p>
+          <p className="text-sm text-muted-foreground">Your progress at a glance.</p>
         </div>
       </div>
 
-      {!goal && (
-        <Alert>
-          <AlertTitle>Set a goal to unlock projections</AlertTitle>
-          <AlertDescription>
-            Add a target weight and pace to see your remaining distance and
-            estimated completion date.{" "}
-            <Link href="/goal" className="font-medium underline underline-offset-4">
-              Set your goal
+      {!hasEntries ? (
+        <Card className="items-center gap-2 px-6 py-14 text-center">
+          <h2 className="text-lg font-semibold">Start tracking</h2>
+          <p className="max-w-xs text-sm text-muted-foreground">
+            Log your first weight to unlock trends, goal projections, and insights.
+          </p>
+          <Button asChild className="mt-4">
+            <Link href="/log">
+              <PlusIcon data-icon="inline-start" />
+              Log first entry
             </Link>
-          </AlertDescription>
-        </Alert>
+          </Button>
+        </Card>
+      ) : (
+        <>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <MetricHero
+              value={
+                stats.currentWeight !== null
+                  ? stats.currentWeight.toFixed(1)
+                  : "—"
+              }
+              unit="kg"
+              label="Current Weight"
+              change={monthly !== null ? `${Math.abs(monthly).toFixed(1)} kg` : undefined}
+              changeLabel="Last 30 days"
+              trend={heroTrend}
+              tone={changeTone(monthly, stats.direction)}
+            />
+            <GoalProgressCard
+              targetWeight={stats.targetWeight}
+              progressPercent={stats.progressPercent}
+              remaining={stats.remaining}
+            />
+          </div>
+
+          <Card className="gap-4 p-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-base font-semibold">Weight Trend</h2>
+              <span className="text-xs text-muted-foreground">
+                Daily · 7-day average
+              </span>
+            </div>
+            <WeightChart entries={analyticsEntries} targetWeight={stats.targetWeight} />
+          </Card>
+
+          <AIInsightCard
+            text={fallbackInsight(stats)}
+            estimatedCompletionDate={stats.estimatedCompletionDate}
+            hasEntries={hasEntries}
+          />
+        </>
       )}
-
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <StatCard
-          label="Current"
-          value={stats.currentWeight !== null ? stats.currentWeight.toFixed(1) : "—"}
-          unit="kg"
-          hint={stats.latestDate ? `as of ${stats.latestDate}` : "no entries yet"}
-        />
-        <StatCard
-          label="Goal"
-          value={stats.targetWeight !== null ? stats.targetWeight.toFixed(1) : "—"}
-          unit="kg"
-          hint={
-            stats.remaining !== null
-              ? `${Math.abs(stats.remaining).toFixed(1)} kg to go`
-              : "no goal set"
-          }
-        />
-        <StatCard
-          label="Weekly change"
-          value={signed(stats.weeklyChange)}
-          unit="kg"
-          trend={
-            stats.weeklyChange === null || Math.abs(stats.weeklyChange) < 0.05
-              ? "flat"
-              : stats.weeklyChange < 0
-                ? "down"
-                : "up"
-          }
-          tone={changeTone(stats.weeklyChange, stats.direction)}
-          hint="vs 7 days ago"
-        />
-        <StatCard
-          label="Monthly change"
-          value={signed(stats.monthlyChange)}
-          unit="kg"
-          trend={
-            stats.monthlyChange === null || Math.abs(stats.monthlyChange) < 0.05
-              ? "flat"
-              : stats.monthlyChange < 0
-                ? "down"
-                : "up"
-          }
-          tone={changeTone(stats.monthlyChange, stats.direction)}
-          hint="vs 30 days ago"
-        />
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Weight trend</CardTitle>
-          <CardDescription>Daily weight with a 7-day moving average.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <WeightChart entries={analyticsEntries} targetWeight={stats.targetWeight} />
-        </CardContent>
-      </Card>
-
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Log today&apos;s weight</CardTitle>
-            <CardDescription>Quick add — takes a few seconds.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <QuickAddWeight defaultWeight={stats.currentWeight} compact />
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <SparklesIcon className="size-4 text-primary" />
-              Progress insight
-            </CardTitle>
-            <CardDescription>A quick read on your trend.</CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-4">
-            <p className="text-sm leading-relaxed">
-              {hasEntries
-                ? quickSummary
-                : "Log a few entries and insights will appear here."}
-            </p>
-            {hasEntries && (
-              <Button asChild variant="outline" size="sm" className="w-fit">
-                <Link href="/insights">
-                  Get AI insights
-                  <ArrowRightIcon data-icon="inline-end" />
-                </Link>
-              </Button>
-            )}
-          </CardContent>
-        </Card>
-      </div>
     </div>
   );
 }

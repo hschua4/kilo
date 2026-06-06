@@ -73,54 +73,65 @@ export function WeightChart({
     const chart = chartRef.current;
     if (!chart) return;
 
-    const primary = cssVar("--primary", "#6366f1");
-    const muted = cssVar("--muted-foreground", "#71717a");
-    const border = cssVar("--border", "#e4e4e7");
-    const fg = cssVar("--foreground", "#18181b");
+    const weightColor = cssVar("--chart-1", "#fafafa"); // weight line (white)
+    const trendColor = cssVar("--chart-2", "#22c55e"); // 7-day avg (success)
+    const muted = cssVar("--muted-foreground", "#a1a1aa");
+    const border = cssVar("--border", "#27272a");
+    const card = cssVar("--card", "#18181b");
 
     const option: echarts.EChartsOption = {
-      grid: { left: 44, right: 16, top: 24, bottom: 56 },
+      grid: { left: 40, right: 16, top: 16, bottom: 48 },
+      textStyle: { fontFamily: "var(--font-sans)" },
       tooltip: {
         trigger: "axis",
+        backgroundColor: card,
+        borderColor: border,
+        textStyle: { color: "#fafafa" },
         valueFormatter: (v) =>
           v == null ? "—" : `${Number(v).toFixed(1)} kg`,
       },
       legend: {
-        data: ["Weight", "7-day avg"],
+        data: ["Weight", "7-day trend"],
         bottom: 0,
         textStyle: { color: muted },
         icon: "roundRect",
+        itemWidth: 14,
+        itemHeight: 3,
       },
       xAxis: {
         type: "time",
-        axisLine: { lineStyle: { color: border } },
-        axisLabel: { color: muted },
+        axisLine: { show: false },
+        axisTick: { show: false },
+        axisLabel: { color: muted, hideOverlap: true },
       },
       yAxis: {
         type: "value",
         scale: true,
         splitLine: { lineStyle: { color: border, type: "dashed" } },
-        axisLabel: { color: muted, formatter: "{value} kg" },
+        axisLabel: { color: muted, formatter: "{value}" },
       },
-      dataZoom: [
-        { type: "inside", filterMode: "none" },
-        { type: "slider", height: 18, bottom: 28, borderColor: border },
-      ],
+      dataZoom: [{ type: "inside", filterMode: "none" }],
       series: [
         {
           name: "Weight",
           type: "line",
-          showSymbol: true,
+          showSymbol: false,
           symbolSize: 5,
           data: series.daily,
-          lineStyle: { color: primary, width: 1 },
-          itemStyle: { color: primary },
+          lineStyle: { color: weightColor, width: 1.5 },
+          itemStyle: { color: weightColor },
+          areaStyle: {
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+              { offset: 0, color: "rgba(250,250,250,0.10)" },
+              { offset: 1, color: "rgba(250,250,250,0)" },
+            ]),
+          },
           markLine:
             targetWeight != null
               ? {
                   silent: true,
                   symbol: "none",
-                  lineStyle: { color: fg, type: "dashed", width: 1 },
+                  lineStyle: { color: muted, type: "dashed", width: 1 },
                   label: {
                     formatter: `Goal ${targetWeight} kg`,
                     color: muted,
@@ -131,14 +142,14 @@ export function WeightChart({
               : undefined,
         },
         {
-          name: "7-day avg",
+          name: "7-day trend",
           type: "line",
           smooth: true,
           showSymbol: false,
           connectNulls: true,
           data: series.avg,
-          lineStyle: { color: primary, width: 3, opacity: 0.45 },
-          itemStyle: { color: primary },
+          lineStyle: { color: trendColor, width: 2.5 },
+          itemStyle: { color: trendColor },
         },
       ],
     };

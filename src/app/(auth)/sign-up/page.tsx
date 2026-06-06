@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { signUp } from "@/lib/auth-client";
+import { GoogleButton } from "@/components/google-button";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -13,7 +14,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Field, FieldGroup, FieldLabel, FieldSeparator } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 
@@ -85,6 +86,8 @@ export default function SignUpPage() {
               {loading && <Spinner data-icon="inline-start" />}
               Create account
             </Button>
+            <FieldSeparator>or</FieldSeparator>
+            <GoogleButton />
           </FieldGroup>
         </form>
       </CardContent>

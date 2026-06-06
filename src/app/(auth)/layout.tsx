@@ -21,7 +21,7 @@ export default async function AuthLayout({
           <span className="flex size-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
             <ActivityIcon className="size-5" />
           </span>
-          <span className="text-lg">ScaleIQ</span>
+          <span className="text-lg">Kilo</span>
         </Link>
         {children}
       </div>

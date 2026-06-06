@@ -13,7 +13,7 @@ export const auth = betterAuth({
     // console so the flow is fully testable locally. Swap in a real mailer
     // (Resend, Postmark, etc.) here for production.
     sendResetPassword: async ({ user, url }) => {
-      console.log(`[ScaleIQ] Password reset for ${user.email}: ${url}`);
+      console.log(`[Kilo] Password reset for ${user.email}: ${url}`);
     },
   },
   socialProviders: {

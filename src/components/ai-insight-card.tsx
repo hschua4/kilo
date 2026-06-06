@@ -30,7 +30,7 @@ export function AIInsightCard({
       <p className="mt-3 text-sm leading-relaxed text-foreground/90">
         {hasEntries
           ? clampSentences(text)
-          : "Log a few entries and ScaleIq will start reading your trend."}
+          : "Log a few entries and Kilo will start reading your trend."}
       </p>
 
       {estimatedCompletionDate && (

@@ -23,7 +23,7 @@ export default async function GoalPage() {
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Your goal</h1>
         <p className="text-sm text-muted-foreground">
-          Set a target and pace. ScaleIQ projects your completion date from here.
+          Set a target and pace. Kilo projects your completion date from here.
         </p>
       </div>
 

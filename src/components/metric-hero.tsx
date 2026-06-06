@@ -6,7 +6,7 @@ type Trend = "down" | "up" | "flat";
 type Tone = "good" | "bad" | "neutral";
 
 /**
- * ScaleIq hero metric — the single dominant number on the screen.
+ * Kilo hero metric — the single dominant number on the screen.
  * Number first, context second, trend third (Design Guidelines §8).
  */
 export function MetricHero({

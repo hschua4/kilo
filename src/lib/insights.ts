@@ -11,7 +11,7 @@ export type InsightResult = {
  */
 export function fallbackInsight(stats: DashboardStats): string {
   if (stats.entryCount === 0) {
-    return "No entries yet. Log your weight a few days in a row and ScaleIQ will start spotting trends and projecting your goal date.";
+    return "No entries yet. Log your weight a few days in a row and Kilo will start spotting trends and projecting your goal date.";
   }
   const parts: string[] = [];
   const rate = stats.observedWeeklyRate;
@@ -100,7 +100,7 @@ export async function generateInsight(
         Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
         "HTTP-Referer": process.env.BETTER_AUTH_URL ?? "http://localhost:3000",
-        "X-Title": "ScaleIQ",
+        "X-Title": "Kilo",
       },
       body: JSON.stringify({
         model,
@@ -118,7 +118,7 @@ export async function generateInsight(
     });
 
     if (!res.ok) {
-      console.error("[ScaleIQ] OpenRouter error", res.status, await res.text());
+      console.error("[Kilo] OpenRouter error", res.status, await res.text());
       return { text: fallbackInsight(stats), source: "fallback" };
     }
 
@@ -127,7 +127,7 @@ export async function generateInsight(
     if (!text) return { text: fallbackInsight(stats), source: "fallback" };
     return { text, source: "ai" };
   } catch (err) {
-    console.error("[ScaleIQ] OpenRouter request failed", err);
+    console.error("[Kilo] OpenRouter request failed", err);
     return { text: fallbackInsight(stats), source: "fallback" };
   }
 }

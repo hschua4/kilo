@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
 /**
- * ScaleIq goal progress (Design Guidelines §8) — target number, progress bar,
+ * Kilo goal progress (Design Guidelines §8) — target number, progress bar,
  * and remaining distance. Falls back to a set-goal CTA when no goal exists.
  */
 export function GoalProgressCard({

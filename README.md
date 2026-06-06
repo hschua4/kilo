@@ -1,4 +1,4 @@
-# ScaleIQ
+# Kilo
 
 Personal weight tracking and body analytics — log your weight, visualize the
 trend, set a goal, and get AI-generated progress insights.

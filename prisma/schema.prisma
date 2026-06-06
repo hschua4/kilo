@@ -1,4 +1,4 @@
-// ScaleIQ schema — Better Auth core tables + app models.
+// Kilo schema — Better Auth core tables + app models.
 // Docs: https://pris.ly/d/prisma-schema
 
 generator client {

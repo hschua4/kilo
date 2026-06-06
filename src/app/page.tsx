@@ -18,7 +18,7 @@ const features = [
   {
     icon: TargetIcon,
     title: "Stay on pace",
-    body: "Set a target and pace — ScaleIQ projects your completion date automatically.",
+    body: "Set a target and pace — Kilo projects your completion date automatically.",
   },
   {
     icon: SparklesIcon,
@@ -38,7 +38,7 @@ export default async function Home() {
           <span className="flex size-7 items-center justify-center rounded-md bg-primary text-primary-foreground">
             <ActivityIcon className="size-4" />
           </span>
-          ScaleIQ
+          Kilo
         </div>
         <div className="flex items-center gap-2">
           <Button asChild variant="ghost" size="sm">

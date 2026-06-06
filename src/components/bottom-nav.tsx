@@ -28,7 +28,7 @@ const tabs = [
 ] as const;
 
 /**
- * ScaleIq bottom navigation (Design Guidelines §10). Five slots with the center
+ * Kilo bottom navigation (Design Guidelines §10). Five slots with the center
  * action permanently reserved for logging weight.
  */
 export function BottomNav({ name, email }: { name: string; email: string }) {

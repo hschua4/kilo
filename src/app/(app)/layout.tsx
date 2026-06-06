@@ -21,7 +21,7 @@ export default async function AppLayout({
             <span className="flex size-7 items-center justify-center rounded-md bg-primary text-primary-foreground">
               <ActivityIcon className="size-4" />
             </span>
-            ScaleIq
+            Kilo
           </Link>
         </div>
       </header>

@@ -1,4 +1,4 @@
-# Multi-stage build for the Kilo (scale-iq) Next.js 16 app.
+# Multi-stage build for the Kilo Next.js 16 app.
 # Built in CI, pushed to GHCR, pulled on the Skylab VPS. Never built on the box.
 #
 # Targets:

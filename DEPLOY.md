@@ -1,4 +1,4 @@
-# Deploying Kilo (scale-iq)
+# Deploying Kilo
 
 Kilo runs as one container on the **Skylab** Hetzner VPS at
 **`kilo.hschua.com`**, behind the shared Traefik proxy, using the shared
@@ -23,7 +23,7 @@ read at runtime from `.env`, so the same image is environment-agnostic.
 ## One-time setup
 
 ### 1. GitHub
-- Create the repo and push (`hschua4/scale-iq` or similar). GHCR images publish
+- Create the repo and push (`hschua4/kilo` or similar). GHCR images publish
   under the repo owner: `ghcr.io/<owner>/kilo` and `.../kilo-migrate`.
 - Repo **Settings → Secrets → Actions** (mirror the other Skylab apps):
   - `TS_OAUTH_CLIENT_ID`, `TS_OAUTH_SECRET` — Tailscale OAuth (tag `tag:ci`).

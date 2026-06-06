@@ -28,7 +28,7 @@ const tabs = [
 ] as const;
 
 /**
- * Forma bottom navigation (Design Guidelines §10). Five slots with the center
+ * ScaleIq bottom navigation (Design Guidelines §10). Five slots with the center
  * action permanently reserved for logging weight.
  */
 export function BottomNav({ name, email }: { name: string; email: string }) {
@@ -110,7 +110,9 @@ function NavTab({
       href={href}
       className={cn(
         "flex h-full min-h-11 flex-col items-center justify-center gap-1 transition-colors",
-        active ? "text-foreground" : "text-muted-foreground hover:text-foreground",
+        active
+          ? "text-foreground"
+          : "text-muted-foreground hover:text-foreground",
       )}
     >
       <Icon className="size-5" />

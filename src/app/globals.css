@@ -87,7 +87,7 @@
   --sidebar-ring: oklch(0.708 0 0);
 }
 
-/* Forma dark theme (primary). Hex values map directly to the design tokens. */
+/* ScaleIq dark theme (primary). Hex values map directly to the design tokens. */
 .dark {
   --background: #09090b;
   --foreground: #fafafa;

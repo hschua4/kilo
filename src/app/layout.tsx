@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Forma — Understand your body's progress",
+  title: "ScaleIq — Understand your body's progress",
   description:
     "Track your weight, visualize the trend, and get AI-powered insights toward your goal.",
 };

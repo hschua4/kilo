@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
 /**
- * Forma goal progress (Design Guidelines §8) — target number, progress bar,
+ * ScaleIq goal progress (Design Guidelines §8) — target number, progress bar,
  * and remaining distance. Falls back to a set-goal CTA when no goal exists.
  */
 export function GoalProgressCard({
@@ -59,7 +59,9 @@ export function GoalProgressCard({
       </div>
 
       <div className="mt-3 flex items-center justify-between text-sm">
-        <span className="font-medium tabular-nums">{pct.toFixed(0)}% complete</span>
+        <span className="font-medium tabular-nums">
+          {pct.toFixed(0)}% complete
+        </span>
         {remaining !== null && (
           <span className="text-muted-foreground tabular-nums">
             {Math.abs(remaining).toFixed(1)} kg to go

@@ -30,12 +30,14 @@ export function AIInsightCard({
       <p className="mt-3 text-sm leading-relaxed text-foreground/90">
         {hasEntries
           ? clampSentences(text)
-          : "Log a few entries and Forma will start reading your trend."}
+          : "Log a few entries and ScaleIq will start reading your trend."}
       </p>
 
       {estimatedCompletionDate && (
         <div className="mt-4 flex flex-col gap-0.5 rounded-2xl bg-secondary/60 px-4 py-3">
-          <span className="text-xs text-muted-foreground">Estimated goal date</span>
+          <span className="text-xs text-muted-foreground">
+            Estimated goal date
+          </span>
           <span className="text-sm font-medium tabular-nums">
             {format(parseISO(estimatedCompletionDate), "d MMM yyyy")}
           </span>
@@ -44,7 +46,10 @@ export function AIInsightCard({
 
       {hasEntries && (
         <Button asChild variant="ghost" size="sm" className="mt-4 w-fit px-0">
-          <Link href="/insights" className="text-muted-foreground hover:text-foreground">
+          <Link
+            href="/insights"
+            className="text-muted-foreground hover:text-foreground"
+          >
             See full insight
             <ArrowRightIcon data-icon="inline-end" />
           </Link>

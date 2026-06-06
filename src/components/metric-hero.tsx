@@ -6,7 +6,7 @@ type Trend = "down" | "up" | "flat";
 type Tone = "good" | "bad" | "neutral";
 
 /**
- * Forma hero metric — the single dominant number on the screen.
+ * ScaleIq hero metric — the single dominant number on the screen.
  * Number first, context second, trend third (Design Guidelines §8).
  */
 export function MetricHero({
@@ -36,7 +36,9 @@ export function MetricHero({
           {value}
         </span>
         {unit && (
-          <span className="text-xl font-medium text-muted-foreground">{unit}</span>
+          <span className="text-xl font-medium text-muted-foreground">
+            {unit}
+          </span>
         )}
       </div>
       <span className="mt-3 text-sm text-muted-foreground">{label}</span>
@@ -54,7 +56,9 @@ export function MetricHero({
             <TrendIcon className="size-3.5" />
             {change}
             {changeLabel && (
-              <span className="font-normal text-muted-foreground">· {changeLabel}</span>
+              <span className="font-normal text-muted-foreground">
+                · {changeLabel}
+              </span>
             )}
           </span>
         </div>

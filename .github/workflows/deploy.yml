@@ -60,10 +60,14 @@ jobs:
 
             # Apply migrations in a one-shot container before swapping the app.
             # Halts the deploy here if a migration fails.
-            docker compose run --rm migrate
+            # -T + </dev/null so it does NOT consume this heredoc over the SSH
+            # stdin — otherwise the lines below are silently swallowed.
+            docker compose run --rm -T migrate </dev/null
 
-            # Rolling swap with healthcheck-aware start-first.
-            docker compose up -d kilo --remove-orphans
+            # Swap the app and block until it reports healthy (--wait), so a
+            # failed swap fails the job instead of being masked by the smoke
+            # test hitting the old container.
+            docker compose up -d --force-recreate --wait kilo --remove-orphans
 
             # Record current SHA for visibility.
             echo "$SHA" > /srv/kilo/CURRENT_SHA

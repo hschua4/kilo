@@ -30,7 +30,7 @@ export function StatCard({
           {label}
         </span>
         <div className="flex items-baseline gap-1">
-          <span className="text-2xl font-semibold tabular-nums">{value}</span>
+          <span className="font-numeric text-2xl font-semibold tabular-nums">{value}</span>
           {unit && <span className="text-sm text-muted-foreground">{unit}</span>}
         </div>
         {hint && (

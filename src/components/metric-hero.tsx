@@ -32,7 +32,7 @@ export function MetricHero({
   return (
     <Card className="gap-0 p-6">
       <div className="flex items-baseline gap-2">
-        <span className="text-6xl font-bold leading-none tracking-tight tabular-nums">
+        <span className="font-numeric text-6xl font-bold leading-none tracking-tight tabular-nums">
           {value}
         </span>
         {unit && (

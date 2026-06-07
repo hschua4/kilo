@@ -45,7 +45,7 @@ export function GoalProgressCard({
       </span>
 
       <div className="mt-2 flex items-baseline gap-1.5">
-        <span className="text-4xl font-semibold tracking-tight tabular-nums">
+        <span className="font-numeric text-4xl font-semibold tracking-tight tabular-nums">
           {targetWeight.toFixed(1)}
         </span>
         <span className="text-base font-medium text-muted-foreground">kg</span>

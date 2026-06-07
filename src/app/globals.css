@@ -139,3 +139,15 @@
     @apply font-sans;
   }
 }
+
+/* Hide scrollbars when launched as an installed PWA (standalone mode).
+   Scrolling still works — only the visible scrollbar is removed. */
+@media (display-mode: standalone) {
+  * {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* legacy Edge/IE */
+  }
+  *::-webkit-scrollbar {
+    display: none; /* Chrome, Safari */
+  }
+}

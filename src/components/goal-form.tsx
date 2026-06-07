@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { addDays, format } from "date-fns";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -18,11 +17,12 @@ type GoalData = {
 export function GoalForm({
   initialGoal,
   currentWeight,
+  onSaved,
 }: {
   initialGoal: GoalData | null;
   currentWeight: number | null;
+  onSaved?: () => void;
 }) {
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [start, setStart] = useState<number | string>(
     initialGoal?.startWeight ?? currentWeight ?? "",
@@ -69,7 +69,7 @@ export function GoalForm({
       return;
     }
     toast.success("Goal saved");
-    router.refresh();
+    onSaved?.();
   }
 
   return (

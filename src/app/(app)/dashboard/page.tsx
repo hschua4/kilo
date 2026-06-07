@@ -1,12 +1,14 @@
+"use client";
+
 import Link from "next/link";
 import { PlusIcon } from "lucide-react";
-import { requireUser } from "@/lib/session";
-import { prisma } from "@/lib/prisma";
-import { getUserEntries, toAnalyticsEntries } from "@/lib/entries";
-import { computeStats, type DashboardStats } from "@/lib/analytics";
+import { computeStats, type DashboardStats, type Entry } from "@/lib/analytics";
 import { fallbackInsight } from "@/lib/insights";
+import { useAppData } from "@/lib/use-app-data";
+import { useSession } from "@/lib/auth-client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import { MetricHero } from "@/components/metric-hero";
 import { GoalProgressCard } from "@/components/goal-progress-card";
 import { AIInsightCard } from "@/components/ai-insight-card";
@@ -23,26 +25,29 @@ function changeTone(
   return change > 0 ? "good" : "bad";
 }
 
-export default async function DashboardPage() {
-  const user = await requireUser();
-  const [entries, goal] = await Promise.all([
-    getUserEntries(user.id),
-    prisma.goal.findUnique({ where: { userId: user.id } }),
-  ]);
+export default function DashboardPage() {
+  const { data: session } = useSession();
+  const { entries, goal, loading, error } = useAppData();
 
-  const analyticsEntries = toAnalyticsEntries(entries);
-  const stats = computeStats(
-    analyticsEntries,
-    goal
-      ? {
-          startWeight: goal.startWeight,
-          targetWeight: goal.targetWeight,
-          weeklyTargetRate: goal.weeklyTargetRate,
-        }
-      : null,
-  );
+  if (loading) {
+    return (
+      <div className="flex justify-center py-16">
+        <Spinner className="size-6 text-muted-foreground" />
+      </div>
+    );
+  }
+  if (error) {
+    return <p className="py-16 text-center text-sm text-destructive">{error}</p>;
+  }
+
+  const analyticsEntries: Entry[] = entries.map((e) => ({
+    date: e.entryDate,
+    weight: e.weight,
+  }));
+  const stats = computeStats(analyticsEntries, goal);
 
   const hasEntries = entries.length > 0;
+  const firstName = session?.user?.name?.split(" ")[0] || "there";
 
   const monthly = stats.monthlyChange;
   const heroTrend =
@@ -57,7 +62,7 @@ export default async function DashboardPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-semibold tracking-tight">
-            Hi, {user.name.split(" ")[0] || "there"}
+            Hi, {firstName}
           </h1>
           <p className="text-sm text-muted-foreground">Your progress at a glance.</p>
         </div>

@@ -1,6 +1,5 @@
-import { requireUser } from "@/lib/session";
-import { prisma } from "@/lib/prisma";
-import { getUserEntries } from "@/lib/entries";
+"use client";
+
 import {
   Card,
   CardContent,
@@ -8,14 +7,24 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Spinner } from "@/components/ui/spinner";
 import { GoalForm } from "@/components/goal-form";
+import { useAppData } from "@/lib/use-app-data";
 
-export default async function GoalPage() {
-  const user = await requireUser();
-  const [goal, entries] = await Promise.all([
-    prisma.goal.findUnique({ where: { userId: user.id } }),
-    getUserEntries(user.id),
-  ]);
+export default function GoalPage() {
+  const { entries, goal, loading, error, refetch } = useAppData();
+
+  if (loading) {
+    return (
+      <div className="flex justify-center py-16">
+        <Spinner className="size-6 text-muted-foreground" />
+      </div>
+    );
+  }
+  if (error) {
+    return <p className="py-16 text-center text-sm text-destructive">{error}</p>;
+  }
+
   const currentWeight = entries.at(-1)?.weight ?? null;
 
   return (
@@ -46,6 +55,7 @@ export default async function GoalPage() {
                 : null
             }
             currentWeight={currentWeight}
+            onSaved={refetch}
           />
         </CardContent>
       </Card>

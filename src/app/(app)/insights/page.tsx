@@ -1,8 +1,8 @@
-import { requireUser } from "@/lib/session";
-import { prisma } from "@/lib/prisma";
-import { getUserEntries, toAnalyticsEntries } from "@/lib/entries";
-import { computeStats } from "@/lib/analytics";
+"use client";
+
+import { computeStats, type Entry } from "@/lib/analytics";
 import { fallbackInsight } from "@/lib/insights";
+import { useAppData } from "@/lib/use-app-data";
 import {
   Card,
   CardContent,
@@ -11,26 +11,29 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Spinner } from "@/components/ui/spinner";
 import { InsightsPanel } from "@/components/insights-panel";
 import { StatCard } from "@/components/stat-card";
 
-export default async function InsightsPage() {
-  const user = await requireUser();
-  const [entries, goal] = await Promise.all([
-    getUserEntries(user.id),
-    prisma.goal.findUnique({ where: { userId: user.id } }),
-  ]);
+export default function InsightsPage() {
+  const { entries, goal, loading, error } = useAppData();
 
-  const stats = computeStats(
-    toAnalyticsEntries(entries),
-    goal
-      ? {
-          startWeight: goal.startWeight,
-          targetWeight: goal.targetWeight,
-          weeklyTargetRate: goal.weeklyTargetRate,
-        }
-      : null,
-  );
+  if (loading) {
+    return (
+      <div className="flex justify-center py-16">
+        <Spinner className="size-6 text-muted-foreground" />
+      </div>
+    );
+  }
+  if (error) {
+    return <p className="py-16 text-center text-sm text-destructive">{error}</p>;
+  }
+
+  const analyticsEntries: Entry[] = entries.map((e) => ({
+    date: e.entryDate,
+    weight: e.weight,
+  }));
+  const stats = computeStats(analyticsEntries, goal);
 
   const rate = stats.observedWeeklyRate;
   const trendLabel =

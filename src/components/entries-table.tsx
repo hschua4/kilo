@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { format, parseISO } from "date-fns";
 import { PencilIcon, Trash2Icon } from "lucide-react";
 import { toast } from "sonner";
@@ -38,8 +37,13 @@ import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { Empty } from "@/components/ui/empty";
 
-export function EntriesTable({ entries }: { entries: SerializedEntry[] }) {
-  const router = useRouter();
+export function EntriesTable({
+  entries,
+  onChanged,
+}: {
+  entries: SerializedEntry[];
+  onChanged?: () => void;
+}) {
   const [editing, setEditing] = useState<SerializedEntry | null>(null);
   const [deleting, setDeleting] = useState<SerializedEntry | null>(null);
   const [busy, setBusy] = useState(false);
@@ -69,7 +73,7 @@ export function EntriesTable({ entries }: { entries: SerializedEntry[] }) {
     }
     toast.success("Entry updated");
     setEditing(null);
-    router.refresh();
+    onChanged?.();
   }
 
   async function confirmDelete() {
@@ -83,7 +87,7 @@ export function EntriesTable({ entries }: { entries: SerializedEntry[] }) {
     }
     toast.success("Entry deleted");
     setDeleting(null);
-    router.refresh();
+    onChanged?.();
   }
 
   if (entries.length === 0) {

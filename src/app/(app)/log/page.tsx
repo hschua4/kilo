@@ -1,5 +1,5 @@
-import { requireUser } from "@/lib/session";
-import { getUserEntries } from "@/lib/entries";
+"use client";
+
 import {
   Card,
   CardContent,
@@ -7,12 +7,25 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Spinner } from "@/components/ui/spinner";
 import { QuickAddWeight } from "@/components/quick-add-weight";
 import { EntriesTable } from "@/components/entries-table";
+import { useAppData } from "@/lib/use-app-data";
 
-export default async function LogPage() {
-  const user = await requireUser();
-  const entries = await getUserEntries(user.id);
+export default function LogPage() {
+  const { entries, loading, error, refetch } = useAppData();
+
+  if (loading) {
+    return (
+      <div className="flex justify-center py-16">
+        <Spinner className="size-6 text-muted-foreground" />
+      </div>
+    );
+  }
+  if (error) {
+    return <p className="py-16 text-center text-sm text-destructive">{error}</p>;
+  }
+
   const latest = entries.at(-1)?.weight ?? null;
 
   return (
@@ -30,7 +43,7 @@ export default async function LogPage() {
           <CardDescription>One entry per day. Editing an existing day? Update it below.</CardDescription>
         </CardHeader>
         <CardContent>
-          <QuickAddWeight defaultWeight={latest} />
+          <QuickAddWeight defaultWeight={latest} onChanged={refetch} />
         </CardContent>
       </Card>
 
@@ -42,7 +55,7 @@ export default async function LogPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <EntriesTable entries={entries} />
+          <EntriesTable entries={entries} onChanged={refetch} />
         </CardContent>
       </Card>
     </div>

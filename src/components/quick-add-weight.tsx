@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { PlusIcon } from "lucide-react";
 import { toast } from "sonner";
 import { todayISO } from "@/lib/dates";
@@ -13,11 +12,12 @@ import { Spinner } from "@/components/ui/spinner";
 export function QuickAddWeight({
   defaultWeight,
   compact = false,
+  onChanged,
 }: {
   defaultWeight?: number | null;
   compact?: boolean;
+  onChanged?: () => void;
 }) {
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -45,7 +45,7 @@ export function QuickAddWeight({
     }
     toast.success("Weight logged");
     form.reset();
-    router.refresh();
+    onChanged?.();
   }
 
   return (

@@ -33,8 +33,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const user = session.user;
 
   return (
-    <div className="flex min-h-svh flex-col">
-      <header className="sticky top-0 z-10 border-b border-border bg-background/80 pt-[env(safe-area-inset-top)] backdrop-blur">
+    // Fixed-height shell so the document itself never scrolls. Only `main`
+    // scrolls internally — this keeps the mobile browser chrome from
+    // collapsing/expanding (which made the fixed bottom nav jump on navigation).
+    <div className="flex h-dvh flex-col overflow-hidden">
+      <header className="z-10 shrink-0 border-b border-border bg-background/80 pt-[env(safe-area-inset-top)] backdrop-blur">
         <div className="mx-auto flex h-14 w-full max-w-2xl items-center px-5">
           <Link
             href="/dashboard"
@@ -48,7 +51,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-2xl flex-1 px-5 py-6 pb-28">
+      <main className="mx-auto w-full max-w-2xl flex-1 overflow-y-auto px-5 py-6">
         {children}
       </main>
 

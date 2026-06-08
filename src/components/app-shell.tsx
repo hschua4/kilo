@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ActivityIcon } from "lucide-react";
 import { useSession } from "@/lib/auth-client";
 import { BottomNav } from "@/components/bottom-nav";
+import { SafeAreaDebug } from "@/components/safe-area-debug";
 import { Spinner } from "@/components/ui/spinner";
 
 /**
@@ -16,43 +17,10 @@ import { Spinner } from "@/components/ui/spinner";
 export function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { data: session, isPending } = useSession();
-  const mainRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     if (!isPending && !session?.user) router.replace("/sign-in");
   }, [isPending, session, router]);
-
-  // iOS PWA bug: on launch from the home screen, the home-indicator region
-  // isn't measured yet, so `env(safe-area-inset-bottom)` evaluates too large and
-  // the bottom nav renders with an extra gap. The value only corrects once the
-  // visual viewport settles, and the sole trigger for that (short of the user
-  // swiping) is a scroll — a reflow or resize event won't recompute `env()`.
-  // So we reproduce a 1px scroll once on launch, scoped to iOS standalone where
-  // the bug exists. `pageshow` (not mount) is the real PWA-launch signal and
-  // also covers bfcache restores.
-  useEffect(() => {
-    if (isPending || !session?.user) return;
-    const nav = navigator as Navigator & { standalone?: boolean };
-    const isStandalone =
-      window.matchMedia("(display-mode: standalone)").matches ||
-      nav.standalone === true;
-    if (!isStandalone) return;
-
-    function settleSafeArea() {
-      const el = mainRef.current;
-      if (!el) return;
-      requestAnimationFrame(() => {
-        el.scrollTop = 1;
-        requestAnimationFrame(() => {
-          el.scrollTop = 0;
-        });
-      });
-    }
-
-    settleSafeArea();
-    window.addEventListener("pageshow", settleSafeArea);
-    return () => window.removeEventListener("pageshow", settleSafeArea);
-  }, [isPending, session]);
 
   // Gate the authenticated shell on the client until the session resolves.
   if (isPending || !session?.user) {
@@ -84,14 +52,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       </header>
 
-      <main
-        ref={mainRef}
-        className="mx-auto w-full max-w-2xl flex-1 overflow-y-auto px-5 py-6"
-      >
+      <main className="mx-auto w-full max-w-2xl flex-1 overflow-y-auto px-5 py-6">
         {children}
       </main>
 
       <BottomNav name={user.name} email={user.email} />
+      <SafeAreaDebug />
     </div>
   );
 }

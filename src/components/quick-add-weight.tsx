@@ -75,6 +75,7 @@ export function QuickAddWeight({
               defaultValue={todayISO()}
               max={todayISO()}
               required
+              className="appearance-none [&::-webkit-date-and-time-value]:m-0 [&::-webkit-date-and-time-value]:text-left"
             />
           </Field>
           {!compact && (

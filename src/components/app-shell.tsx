@@ -22,21 +22,36 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     if (!isPending && !session?.user) router.replace("/sign-in");
   }, [isPending, session, router]);
 
-  // iOS PWA bug: on first launch from the home screen, the home-indicator
-  // region isn't measured yet, so `env(safe-area-inset-bottom)` resolves too
-  // large and the bottom nav renders with an extra gap. The first scroll forces
-  // iOS to settle the visual viewport and recompute `env()`. Reproduce that
-  // scroll once after mount (1px and back) so it self-corrects without a swipe.
+  // iOS PWA bug: on launch from the home screen, the home-indicator region
+  // isn't measured yet, so `env(safe-area-inset-bottom)` evaluates too large and
+  // the bottom nav renders with an extra gap. The value only corrects once the
+  // visual viewport settles, and the sole trigger for that (short of the user
+  // swiping) is a scroll — a reflow or resize event won't recompute `env()`.
+  // So we reproduce a 1px scroll once on launch, scoped to iOS standalone where
+  // the bug exists. `pageshow` (not mount) is the real PWA-launch signal and
+  // also covers bfcache restores.
   useEffect(() => {
     if (isPending || !session?.user) return;
-    const el = mainRef.current;
-    if (!el) return;
-    requestAnimationFrame(() => {
-      el.scrollTop = 1;
+    const nav = navigator as Navigator & { standalone?: boolean };
+    const isStandalone =
+      window.matchMedia("(display-mode: standalone)").matches ||
+      nav.standalone === true;
+    if (!isStandalone) return;
+
+    function settleSafeArea() {
+      const el = mainRef.current;
+      if (!el) return;
       requestAnimationFrame(() => {
-        el.scrollTop = 0;
+        el.scrollTop = 1;
+        requestAnimationFrame(() => {
+          el.scrollTop = 0;
+        });
       });
-    });
+    }
+
+    settleSafeArea();
+    window.addEventListener("pageshow", settleSafeArea);
+    return () => window.removeEventListener("pageshow", settleSafeArea);
   }, [isPending, session]);
 
   // Gate the authenticated shell on the client until the session resolves.

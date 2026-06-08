@@ -38,12 +38,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     // scrolls internally — this keeps the mobile browser chrome from
     // collapsing/expanding (which made the fixed bottom nav jump on navigation).
     //
-    // Uses `svh` (static small-viewport height), not `dvh`. On iOS standalone
-    // PWAs, `100dvh` resolves to the full screen on first paint (before the
-    // visual viewport settles), making the shell too tall and leaving a gap
-    // below the bottom nav until the first scroll corrects it. `svh` is the
-    // stable minimum height and resolves correctly from the first frame.
-    <div className="flex h-svh flex-col overflow-hidden">
+    // Uses `lvh` (static large-viewport height). With `viewport-fit=cover` the
+    // document spans the full screen, so the shell must fill `lvh` (= screen
+    // height) for the bottom nav to reach the physical bottom; the nav's own
+    // `env(safe-area-inset-bottom)` padding clears the home indicator. `svh`
+    // stops short of the safe-area band (leaving a gap below the nav) and `dvh`
+    // flip-flops on the iOS first-paint settle — `lvh` is full and stable.
+    <div className="flex h-lvh flex-col overflow-hidden">
       <header className="z-10 shrink-0 border-b border-border bg-background/80 pt-[env(safe-area-inset-top)] backdrop-blur">
         <div className="mx-auto flex h-14 w-full max-w-2xl items-center px-5">
           <Link

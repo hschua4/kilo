@@ -3,11 +3,11 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
+  HistoryIcon,
   LayoutDashboardIcon,
   LogOutIcon,
   PlusIcon,
   SparklesIcon,
-  TargetIcon,
   UserIcon,
 } from "lucide-react";
 import { signOut } from "@/lib/auth-client";
@@ -23,7 +23,7 @@ import {
 
 const tabs = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboardIcon },
-  { href: "/goal", label: "Goal", icon: TargetIcon },
+  { href: "/history", label: "History", icon: HistoryIcon },
   { href: "/insights", label: "Insights", icon: SparklesIcon },
 ] as const;
 

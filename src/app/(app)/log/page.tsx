@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
 import { QuickAddWeight } from "@/components/quick-add-weight";
-import { EntriesTable } from "@/components/entries-table";
 import { useAppData } from "@/lib/use-app-data";
 
 export default function LogPage() {
@@ -44,18 +43,6 @@ export default function LogPage() {
         </CardHeader>
         <CardContent>
           <QuickAddWeight defaultWeight={latest} onChanged={refetch} />
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>History</CardTitle>
-          <CardDescription>
-            {entries.length} {entries.length === 1 ? "entry" : "entries"} recorded.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <EntriesTable entries={entries} onChanged={refetch} />
         </CardContent>
       </Card>
     </div>

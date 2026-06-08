@@ -38,7 +38,8 @@ export function GoalProgressCard({
   const pct = progressPercent ?? 0;
 
   return (
-    <Card className="gap-0 p-6">
+    <Link href="/goal" aria-label="Edit your goal" className="block">
+    <Card className="gap-0 p-6 transition-colors hover:bg-accent/50">
       <span className="flex items-center gap-2 text-sm text-muted-foreground">
         <TargetIcon className="size-4" />
         Goal
@@ -69,5 +70,6 @@ export function GoalProgressCard({
         )}
       </div>
     </Card>
+    </Link>
   );
 }

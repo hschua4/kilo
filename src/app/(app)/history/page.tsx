@@ -1,0 +1,50 @@
+"use client";
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Spinner } from "@/components/ui/spinner";
+import { EntriesTable } from "@/components/entries-table";
+import { useAppData } from "@/lib/use-app-data";
+
+export default function HistoryPage() {
+  const { entries, loading, error, refetch } = useAppData();
+
+  if (loading) {
+    return (
+      <div className="flex justify-center py-16">
+        <Spinner className="size-6 text-muted-foreground" />
+      </div>
+    );
+  }
+  if (error) {
+    return <p className="py-16 text-center text-sm text-destructive">{error}</p>;
+  }
+
+  return (
+    <div className="flex flex-col gap-6">
+      <div>
+        <h1 className="text-2xl font-semibold tracking-tight">History</h1>
+        <p className="text-sm text-muted-foreground">
+          Review, edit, or remove your past weight entries.
+        </p>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>All entries</CardTitle>
+          <CardDescription>
+            {entries.length} {entries.length === 1 ? "entry" : "entries"} recorded.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <EntriesTable entries={entries} onChanged={refetch} />
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

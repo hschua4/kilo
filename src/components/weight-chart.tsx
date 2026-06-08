@@ -120,14 +120,7 @@ export function WeightChart({
               minTickGap={32}
               tickFormatter={(value: string) => format(parseISO(value), "MMM d")}
             />
-            <YAxis
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-              width={36}
-              domain={["dataMin - 1", "dataMax + 1"]}
-              tickFormatter={(value: number) => `${value}`}
-            />
+            <YAxis hide domain={["dataMin - 1", "dataMax + 1"]} />
             <ChartTooltip
               cursor={false}
               content={

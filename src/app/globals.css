@@ -4,6 +4,9 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Matches when launched as an installed PWA (standalone display mode). */
+@custom-variant standalone (@media (display-mode: standalone));
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

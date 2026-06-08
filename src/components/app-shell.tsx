@@ -44,22 +44,25 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     // stops short of the safe-area band (leaving a gap below the nav) and `dvh`
     // flip-flops on the iOS first-paint settle — `lvh` is full and stable.
     <div className="flex h-lvh flex-col overflow-hidden">
-      <header className="z-10 shrink-0 border-b border-border bg-background/80 pt-[env(safe-area-inset-top)] backdrop-blur">
-        <div className="mx-auto flex h-14 w-full max-w-2xl items-center px-5">
-          <Link
-            href="/dashboard"
-            className="flex items-center gap-2 font-semibold"
-          >
-            <span className="flex size-7 items-center justify-center rounded-md bg-primary text-primary-foreground">
-              <ActivityIcon className="size-4" />
-            </span>
-            Kilo
-          </Link>
-        </div>
-      </header>
+      {/* The header lives inside the scroll container so that in PWA
+          (standalone) mode it scrolls away with the page. In a regular
+          browser tab it's `sticky` to stay pinned to the top as before. */}
+      <main className="flex-1 overflow-y-auto">
+        <header className="sticky top-0 z-10 border-b border-border bg-background/80 pt-[env(safe-area-inset-top)] backdrop-blur standalone:static">
+          <div className="mx-auto flex h-14 w-full max-w-2xl items-center px-5">
+            <Link
+              href="/dashboard"
+              className="flex items-center gap-2 font-semibold"
+            >
+              <span className="flex size-7 items-center justify-center rounded-md bg-primary text-primary-foreground">
+                <ActivityIcon className="size-4" />
+              </span>
+              Kilo
+            </Link>
+          </div>
+        </header>
 
-      <main className="mx-auto w-full max-w-2xl flex-1 overflow-y-auto px-5 py-6">
-        {children}
+        <div className="mx-auto w-full max-w-2xl px-5 py-6">{children}</div>
       </main>
 
       <BottomNav name={user.name} email={user.email} />

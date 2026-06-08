@@ -1,13 +1,13 @@
-"use client";
+import { redirect } from "next/navigation";
+import { getSession } from "@/lib/session";
+import { HomeView } from "@/components/home-view";
 
-import dynamic from "next/dynamic";
-
-// Client-only landing page (no SSR prerender) — true client-side rendering.
-const HomeView = dynamic(
-  () => import("@/components/home-view").then((m) => m.HomeView),
-  { ssr: false },
-);
-
-export default function Home() {
+// Server-rendered entry point. Authenticated users are redirected to the
+// dashboard before any landing markup is sent, so opening the installed PWA
+// (start_url "/") never flashes the marketing page. Reading the session marks
+// this route dynamic.
+export default async function Home() {
+  const session = await getSession();
+  if (session?.user) redirect("/dashboard");
   return <HomeView />;
 }

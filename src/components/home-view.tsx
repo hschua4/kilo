@@ -1,15 +1,12 @@
 "use client";
 
-import { useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import {
   ActivityIcon,
   LineChartIcon,
   SparklesIcon,
   TargetIcon,
 } from "lucide-react";
-import { useSession } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 
 const features = [
@@ -31,13 +28,6 @@ const features = [
 ];
 
 export function HomeView() {
-  const router = useRouter();
-  const { data: session } = useSession();
-
-  useEffect(() => {
-    if (session?.user) router.replace("/dashboard");
-  }, [session, router]);
-
   return (
     <div className="flex flex-1 flex-col">
       <header className="mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-4">

@@ -54,7 +54,13 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         {children}
-        <Toaster richColors position="top-center" theme="dark" />
+        <Toaster
+          richColors
+          position="top-center"
+          theme="dark"
+          offset={{ top: "calc(env(safe-area-inset-top) + 16px)" }}
+          mobileOffset={{ top: "calc(env(safe-area-inset-top) + 16px)" }}
+        />
         <PwaRegister />
       </body>
     </html>

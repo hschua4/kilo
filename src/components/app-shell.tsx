@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { ActivityIcon } from "lucide-react";
 import { useSession } from "@/lib/auth-client";
 import { BottomNav } from "@/components/bottom-nav";
-import { SafeAreaDebug } from "@/components/safe-area-debug";
 import { Spinner } from "@/components/ui/spinner";
 
 /**
@@ -37,7 +36,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     // Fixed-height shell so the document itself never scrolls. Only `main`
     // scrolls internally — this keeps the mobile browser chrome from
     // collapsing/expanding (which made the fixed bottom nav jump on navigation).
-    <div className="flex h-dvh flex-col overflow-hidden">
+    //
+    // Uses `svh` (static small-viewport height), not `dvh`. On iOS standalone
+    // PWAs, `100dvh` resolves to the full screen on first paint (before the
+    // visual viewport settles), making the shell too tall and leaving a gap
+    // below the bottom nav until the first scroll corrects it. `svh` is the
+    // stable minimum height and resolves correctly from the first frame.
+    <div className="flex h-svh flex-col overflow-hidden">
       <header className="z-10 shrink-0 border-b border-border bg-background/80 pt-[env(safe-area-inset-top)] backdrop-blur">
         <div className="mx-auto flex h-14 w-full max-w-2xl items-center px-5">
           <Link
@@ -57,7 +62,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </main>
 
       <BottomNav name={user.name} email={user.email} />
-      <SafeAreaDebug />
     </div>
   );
 }

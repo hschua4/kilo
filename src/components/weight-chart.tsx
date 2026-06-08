@@ -5,18 +5,15 @@ import {
   Area,
   CartesianGrid,
   ComposedChart,
-  Line,
   ReferenceLine,
   XAxis,
   YAxis,
 } from "recharts";
 import { addDays, format, parseISO } from "date-fns";
-import { movingAverage, sortEntries, type Entry } from "@/lib/analytics";
+import { sortEntries, type Entry } from "@/lib/analytics";
 import {
   type ChartConfig,
   ChartContainer,
-  ChartLegend,
-  ChartLegendContent,
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
@@ -38,15 +35,11 @@ const RANGE_DAYS: Record<RangeKey, number | null> = {
 const chartConfig = {
   weight: {
     label: "Weight",
-    color: "var(--chart-1)",
-  },
-  avg: {
-    label: "7-day trend",
-    color: "var(--chart-2)",
+    color: "var(--color-green-600)",
   },
 } satisfies ChartConfig;
 
-type ChartDatum = { date: string; weight: number; avg: number | null };
+type ChartDatum = { date: string; weight: number };
 
 export function WeightChart({
   entries,
@@ -59,11 +52,9 @@ export function WeightChart({
 
   const data = useMemo<ChartDatum[]>(() => {
     const sorted = sortEntries(entries);
-    const ma = movingAverage(sorted, 7);
-    const all = sorted.map((e, i) => ({
+    const all = sorted.map((e) => ({
       date: e.date,
       weight: e.weight,
-      avg: ma[i],
     }));
 
     const days = RANGE_DAYS[range];
@@ -145,23 +136,13 @@ export function WeightChart({
                 />
               }
             />
-            <ChartLegend content={<ChartLegendContent />} />
             <Area
               dataKey="weight"
               type="monotone"
               fill="url(#fillWeight)"
               stroke="var(--color-weight)"
-              strokeWidth={1.5}
+              strokeWidth={2}
               dot={false}
-              isAnimationActive={false}
-            />
-            <Line
-              dataKey="avg"
-              type="monotone"
-              stroke="var(--color-avg)"
-              strokeWidth={2.5}
-              dot={false}
-              connectNulls
               isAnimationActive={false}
             />
             {targetWeight != null && (

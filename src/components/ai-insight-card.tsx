@@ -6,9 +6,15 @@ import { Button } from "@/components/ui/button";
 
 /** Keep insights tight — max 3 sentences (Design Guidelines §8). */
 function clampSentences(text: string, max = 3): string {
-  const sentences = text.match(/[^.!?]+[.!?]+/g);
+  // Only treat .!? as a sentence boundary when followed by whitespace or the
+  // end of the string, so decimals like "2.24" aren't split mid-number.
+  const sentences = text.match(/[\s\S]*?[.!?]+(?=\s|$)/g);
   if (!sentences) return text.trim();
-  return sentences.slice(0, max).join(" ").trim();
+  return sentences
+    .slice(0, max)
+    .map((s) => s.trim())
+    .join(" ")
+    .trim();
 }
 
 export function AIInsightCard({

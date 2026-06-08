@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ActivityIcon } from "lucide-react";
@@ -16,10 +16,28 @@ import { Spinner } from "@/components/ui/spinner";
 export function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { data: session, isPending } = useSession();
+  const mainRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     if (!isPending && !session?.user) router.replace("/sign-in");
   }, [isPending, session, router]);
+
+  // iOS PWA bug: on first launch from the home screen, the home-indicator
+  // region isn't measured yet, so `env(safe-area-inset-bottom)` resolves too
+  // large and the bottom nav renders with an extra gap. The first scroll forces
+  // iOS to settle the visual viewport and recompute `env()`. Reproduce that
+  // scroll once after mount (1px and back) so it self-corrects without a swipe.
+  useEffect(() => {
+    if (isPending || !session?.user) return;
+    const el = mainRef.current;
+    if (!el) return;
+    requestAnimationFrame(() => {
+      el.scrollTop = 1;
+      requestAnimationFrame(() => {
+        el.scrollTop = 0;
+      });
+    });
+  }, [isPending, session]);
 
   // Gate the authenticated shell on the client until the session resolves.
   if (isPending || !session?.user) {
@@ -51,7 +69,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-2xl flex-1 overflow-y-auto px-5 py-6">
+      <main
+        ref={mainRef}
+        className="mx-auto w-full max-w-2xl flex-1 overflow-y-auto px-5 py-6"
+      >
         {children}
       </main>
 

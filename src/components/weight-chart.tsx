@@ -35,7 +35,7 @@ const RANGE_DAYS: Record<RangeKey, number | null> = {
 const chartConfig = {
   weight: {
     label: "Weight",
-    color: "var(--color-green-600)",
+    color: "var(--color-success)",
   },
 } satisfies ChartConfig;
 

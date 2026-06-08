@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { ActivityIcon } from "lucide-react";
 import { useSession } from "@/lib/auth-client";
 import { BottomNav } from "@/components/bottom-nav";
-import { SafeAreaDebug } from "@/components/safe-area-debug";
 import { Spinner } from "@/components/ui/spinner";
 
 /**
@@ -64,7 +63,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </main>
 
       <BottomNav name={user.name} email={user.email} />
-      <SafeAreaDebug />
     </div>
   );
 }
